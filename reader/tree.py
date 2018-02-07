@@ -7,7 +7,6 @@ def tree():
     return defaultdict(tree)
 
 
-
 def dirs(_dir):
     """ 遍历文件夹
     :param _dir:  文件夹名字
