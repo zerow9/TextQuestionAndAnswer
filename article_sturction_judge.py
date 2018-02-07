@@ -129,10 +129,12 @@ def article_sturction_judge_main(path):
     for paragraph in document.paragraphs:
         article.append(paragraph.text)
     paragraph_head_order = "[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
-    important_struction = make_main_para(article, paragraph_head_order)
-    print(important_struction) #中间结果
-    print(para_mid_QA(article,important_struction, paragraph_head_order))
-    json.dumps('', ensure_ascii=False)
+    important_struction = make_main_para(article, paragraph_head_order) #中间结果
+    # print(important_struction)
+    questionAnswer = para_mid_QA(article,important_struction, paragraph_head_order)
+    # json.dumps('', ensure_ascii=False)
+    # important_struction 中间结果存数据库
+    return questionAnswer
 
 if __name__ == '__main__':
-    article_sturction_judge_main("nineteenReportDocuments.docx")
+    print(article_sturction_judge_main("nineteenReportDocuments.docx"))

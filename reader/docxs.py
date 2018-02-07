@@ -35,8 +35,8 @@ def reader_doc(doc_name):
             if i != 0:
                 body.append(str(uuid.uuid1()))
         crate_tree(head, body)
-        print("创建第%d张表成功" % (s + 1))
-    print("创建树完毕！")
+        # print("创建第%d张表成功" % (s + 1))
+    # print("创建树完毕！")
     return trees
 
 

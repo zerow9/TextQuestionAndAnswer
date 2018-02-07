@@ -15,7 +15,7 @@ def semi_structured_main(fileDirs):
             trees = doc.reader_doc(file)
         if file.endswith(".xls"):
             trees = excel.read_excel(file)
-        mysql.ergodic_tree(trees, file_name)
+        return mysql.ergodic_tree(trees, file_name)
 
 if __name__ == '__main__':
-    semi_structured_main("text")
+    print(semi_structured_main("text"))
