@@ -1,21 +1,14 @@
 #!/usr/bin/env python
 #!coding:utf-8
-import docx
-from docx import Document
-import copy
-import re
-import numpy as np
-import math
 from itertools import chain
+from docx import Document
 import pandas as pd
+import numpy as np
+import copy
+import docx
+import math
 import json
-
-path = "nineteenReportDocuments.docx"
-document = Document(path)
-
-article=[]
-for paragraph in document.paragraphs:
-    article.append(paragraph.text)
+import re
 
 def make_main_para(article,paragraph_head_order):
     # paragraph_head_order="[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
@@ -86,7 +79,7 @@ def make_main_para(article,paragraph_head_order):
             para_order_final[i]=head_final[num]
         return (para_order_final)
 
-def para_mid_QA(important_struction,paragraph_head_order):
+def para_mid_QA(article,important_struction,paragraph_head_order):
     # paragraph_head_order="[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
     keys_list=[]
     values_list=[]
@@ -127,13 +120,19 @@ def para_mid_QA(important_struction,paragraph_head_order):
             value_small=value_small.split("。")[0]
             value_final.append(value_small.replace("　",''))
         QA_list_final[key.replace("　",'')]=value_final
-        print(key.replace("　",''))
-        print(value_final)
     return(QA_list_final)
 
-if __name__ == '__main__':
+def article_sturction_judge_main(path):
+    # path = "nineteenReportDocuments.docx"
+    document = Document(path)
+    article = []
+    for paragraph in document.paragraphs:
+        article.append(paragraph.text)
     paragraph_head_order = "[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
     important_struction = make_main_para(article, paragraph_head_order)
-    print(important_struction)
-    print(para_mid_QA(important_struction, paragraph_head_order))
-    json.dumps('',ensure_ascii=False)
+    print(important_struction) #中间结果
+    print(para_mid_QA(article,important_struction, paragraph_head_order))
+    json.dumps('', ensure_ascii=False)
+
+if __name__ == '__main__':
+    article_sturction_judge_main("nineteenReportDocuments.docx")

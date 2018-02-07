@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#!coding:utf-8
 import xlrd
 import reader.tree as tree
 import uuid

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#!coding:utf-8
 import docx
 import uuid
 import reader.tree as tree

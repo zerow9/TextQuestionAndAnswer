@@ -1,17 +1,26 @@
+#!/usr/bin/env python
+#!coding:utf-8
 import pymysql as mysql
 import datetime
 
 # 连接数据库的信息
-conn = mysql.connect(host="192.168.160.36", user="zw", passwd="root", db="ask", charset="utf8")
-values = []
+# conn = mysql.connect(host="192.168.160.36", user="zw", passwd="root", db="ask", charset="utf8")
 
+def isNumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
-def insert_mysql():
+def insert_mysql(values):
     """插入数据库"""
-    global values
+    # global values
     for (ask,label,anwser,_,_) in values:
         if 'UUID' in label or str(ask).count("-")==4 or str(ask)==str(anwser):
             continue
+        if isNumber(ask):
+            ask = int(ask)
         ask=str(ask)+"的"+str(label)+'是什么?'
         print(ask,"-->"+str(anwser))
     # cur = conn.cursor()
@@ -23,10 +32,11 @@ def insert_mysql():
     # values.clear()
 
 
-def bitch_insert(ask):
+def bitch_insert(values,ask):
     """批量加入"""
-    global values
+    # global values
     values.append(ask)
+    return values
 
 
 def ergodic_tree(trees, file_name):
@@ -34,6 +44,7 @@ def ergodic_tree(trees, file_name):
     :param trees:  树
     :param file_name:  文件名
     """
+    values = []
     if not trees:
         return
     for ask in trees:
@@ -47,5 +58,5 @@ def ergodic_tree(trees, file_name):
                     if len(str(ask)) or len(str(label)) or len(str(value)):
                         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         f = (ask, label, value, file_name, dt)
-                        bitch_insert(f)
-    insert_mysql()
+                        bitch_insert(values,f)
+    insert_mysql(values)

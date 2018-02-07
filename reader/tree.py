@@ -1,11 +1,11 @@
+#!/usr/bin/env python
+#!coding:utf-8
 from collections import defaultdict
 import os
-
 
 def tree():
     """创建树"""
     return defaultdict(tree)
-
 
 def dirs(_dir):
     """ 遍历文件夹
@@ -19,7 +19,6 @@ def dirs(_dir):
         for d in dirs_:
             os.path.join(root, d)
     return file
-
 
 def ask_answer(trees, _ask):
     """ 测试问答对，问答对问题和标签用逗号隔开(ask,label)
