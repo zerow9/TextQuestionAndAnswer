@@ -8,6 +8,7 @@ import reader.tree as tree
 
 def semi_structured_main(fileDirs):
     files = f.dirs(fileDirs)
+    questionAnswer = {}
     for file in files:
         file_name = file.split("\\")[-1]
         trees = None
@@ -15,7 +16,9 @@ def semi_structured_main(fileDirs):
             trees = doc.reader_doc(file)
         if file.endswith(".xls"):
             trees = excel.read_excel(file)
-        return mysql.ergodic_tree(trees, file_name)
+        questionAnswer = dict(questionAnswer,**(mysql.ergodic_tree(trees, file_name)))
+    return questionAnswer
 
 if __name__ == '__main__':
-    print(semi_structured_main("text"))
+    semi_structured_main("text")
+

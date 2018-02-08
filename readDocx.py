@@ -23,11 +23,9 @@ def connectDataBase(host,user,password,database,port):
 
 def sentencesQuestionAnswer(documentName):
     questionAnswer = {}
-    Goblenumber = 0
     maxLenByte = 128
     minLenByte = 10
     #获取文档对象
-    # file=docx.Document("nineteenReportDocuments.docx")
     file = docx.Document(documentName)
     # print("段落数:"+str(len(file.paragraphs)))
     client = baiduAPI()
@@ -62,7 +60,6 @@ def sentencesQuestionAnswer(documentName):
                     flagSQL = False
                 else:
                     baidu_result = client.depParser(sentence)
-                    # print(baidu_result)
                     try:
                         if baidu_result['error_code'] in [4,14,17,18,19,100,110,111,311,282000,282002,282004,282130,282131,282133,282300,282301,282302,282303]:
                             continue
@@ -80,11 +77,6 @@ def sentencesQuestionAnswer(documentName):
                 except Exception as e:
                     connect.rollback()
                     print(e.args)
-            # print(sentence)
-            # fileOpen.write(str(sentence)+'\n')
-            # print(baidu_result)
-            # fileOpen.write(str(baidu_result)+'\n')
-
             whatQuestion = ''
             whoQuestion = ''
             whenQuestion = ''
@@ -158,33 +150,19 @@ def sentencesQuestionAnswer(documentName):
                     if not whoFlag:
                         whoQuestion += deprel['word']
 
-            # FrequentlyAskedQuestions.write('Question:\n')
             if '什么' in whatQuestion:
                 questionAnswer[whatQuestion+'?'] = sentence
-                # FrequentlyAskedQuestions.write('\t'+whatQuestion+'?\n')
             if '什么时候' in whenQuestion:
                 questionAnswer[whenQuestion+'?'] = sentence
-                # FrequentlyAskedQuestions.write('\t'+whenQuestion+'?\n')
             if '多少' in howQuestion:
                 questionAnswer[howQuestion+'?'] = sentence
-                # FrequentlyAskedQuestions.write('\t'+howQuestion+'?\n')
             if '谁/什么' in whoQuestion:
                 questionAnswer[whoQuestion+'?'] = sentence
-                # FrequentlyAskedQuestions.write('\t'+whoQuestion+'?\n')
-            # FrequentlyAskedQuestions.write('Answer:\n')
-            # FrequentlyAskedQuestions.write('\t'+sentence+'\n\n')
-            Goblenumber += 1
-            # print(Goblenumber)
-            # fileOpen.write('\n')
     connect.close()
     return questionAnswer
 
 def sentencesMain(path):
-    # fileOpen = open('testXXXX.txt', 'w', encoding='utf-8')
-    # FrequentlyAskedQuestions = open('FrequentlyAskedQuestionsQueryXXXXXX.txt', 'w', encoding='utf-8')
     return sentencesQuestionAnswer(path)
-    # fileOpen.close()
-    # FrequentlyAskedQuestions.close()
 
 if __name__ == '__main__':
     print(sentencesMain("nineteenReportDocuments.docx"))

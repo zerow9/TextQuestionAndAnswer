@@ -130,7 +130,6 @@ def article_sturction_judge_main(path):
         article.append(paragraph.text)
     paragraph_head_order = "[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
     important_struction = make_main_para(article, paragraph_head_order) #中间结果
-    # print(important_struction)
     questionAnswer = para_mid_QA(article,important_struction, paragraph_head_order)
     # json.dumps('', ensure_ascii=False)
     # important_struction 中间结果存数据库

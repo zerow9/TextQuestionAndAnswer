@@ -15,24 +15,21 @@ def isNumber(s):
 
 def insert_mysql(values):
     """插入数据库"""
-    # global values
     questionAnwser = {}
     for (ask,label,anwser,_,_) in values:
+        ans =set()
         if 'UUID' in label or str(ask).count("-")==4 or str(ask)==str(anwser):
             continue
         if isNumber(ask):
             ask = int(ask)
         ask=str(ask)+"的"+str(label)+'是什么?'
-        questionAnwser[ask] = str(anwser)
+        if ask in questionAnwser.keys():
+            if questionAnwser[ask]:
+                for s in questionAnwser[ask]:
+                    ans.add(s)
+        ans.add(anwser)
+        questionAnwser[ask]=ans
     return questionAnwser
-        # print(ask,"-->"+str(anwser))
-    # cur = conn.cursor()
-    # sql = "INSERT INTO ask_answer(ask,label,answer,filename,time) VALUES (%s,%s,%s,%s,%s)"
-    # cur.executemany(sql, values)
-    # conn.commit()
-    # cur.close()
-    # print("保存完毕！")
-    # values.clear()
 
 
 def bitch_insert(values,ask):
@@ -61,5 +58,5 @@ def ergodic_tree(trees, file_name):
                     if len(str(ask)) or len(str(label)) or len(str(value)):
                         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         f = (ask, label, value, file_name, dt)
-                        bitch_insert(values,f)
+                        values = bitch_insert(values,f)
     return insert_mysql(values)
