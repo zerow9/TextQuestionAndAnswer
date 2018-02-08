@@ -158,13 +158,13 @@ def sentencesQuestionAnswer(documentName):
                         whoQuestion += deprel['word']
 
             if '什么' in whatQuestion:
-                questionAnswer[whatQuestion + '?'] = sentence
+                questionAnswer[whatQuestion + '?'] = [sentence]
             if '什么时候' in whenQuestion:
-                questionAnswer[whenQuestion + '?'] = sentence
+                questionAnswer[whenQuestion + '?'] = [sentence]
             if '多少' in howQuestion:
-                questionAnswer[howQuestion + '?'] = sentence
+                questionAnswer[howQuestion + '?'] = [sentence]
             if '谁/什么' in whoQuestion:
-                questionAnswer[whoQuestion + '?'] = sentence
+                questionAnswer[whoQuestion + '?'] = [sentence]
     connect.close()
     return questionAnswer
 
