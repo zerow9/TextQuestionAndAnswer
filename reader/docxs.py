@@ -7,9 +7,6 @@ import random
 import string
 
 # 创建一个颗树
-trees = tree.tree()
-
-
 def salt():
     """生成随机盐"""
     return ''.join(random.sample(string.ascii_letters, 4))
@@ -20,6 +17,8 @@ def reader_doc(doc_name):
     :param doc_name:  读取文档名
     :return:  创建好一棵树
     """
+    trees = tree.tree()
+
     doc = docx.Document(doc_name)
     for s, t in enumerate(doc.tables):
         head = []
@@ -34,17 +33,16 @@ def reader_doc(doc_name):
                     body.append(c.text)
             if i != 0:
                 body.append(str(uuid.uuid1()))
-        crate_tree(head, body)
+        trees = crate_tree(trees,head, body)
     return trees
 
 
-def crate_tree(head, body):
+def crate_tree(trees,head, body):
     """创建一棵树
     :param head: 树头
     :param body:  节点
     """
     head.append("uuid")
-    global trees
     loop = len(head)
     last = loop - 1
     _all = len(body)
@@ -58,3 +56,4 @@ def crate_tree(head, body):
             else:
                 node[head[last]] = _uuid
             trees[_uuid][head[j]] = _cell
+    return trees

@@ -7,15 +7,14 @@ def tree():
     """创建树"""
     return defaultdict(tree)
 
-def dirs(_dir):
+def dirs(_dir,fileList):
     """ 遍历文件夹
     :param _dir:  文件夹名字
     """
-    file = []
     for (root, dirs_, files) in os.walk(_dir):
         for filename in files:
             name = os.path.join(root, filename)
-            file.append(name)
+            fileList.append(name)
         for d in dirs_:
             os.path.join(root, d)
-    return file
+    return fileList

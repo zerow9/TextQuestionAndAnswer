@@ -4,16 +4,15 @@ import xlrd
 import reader.tree as tree
 import uuid
 
-header = []
-body = []
-trees = tree.tree()
-
-
 def read_excel(excel_file):
     """ 读取文档
     :param excel_file: 文件名
     :return:  创建好一棵树
     """
+    header = []
+    body = []
+    trees = tree.tree()
+
     excel = xlrd.open_workbook(excel_file)
     sheets = excel.sheet_names()
     for sheet in sheets:
@@ -28,14 +27,13 @@ def read_excel(excel_file):
                 continue
             values[0] = str(uuid.uuid1())
             body.append(values)
-    return crate_tree()
+    return crate_tree(trees,header,body)
 
 
-def crate_tree():
+def crate_tree(trees,header,body):
     """创建树
     :return: 创建好一棵树
     """
-    global trees
     # 在每个树头最后都加上一个UUID
     header[0] = "UUID"
     loop = len(header)

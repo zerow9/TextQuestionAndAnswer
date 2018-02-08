@@ -5,10 +5,15 @@ import reader.excel as excel
 import reader.tree as f
 import reader.mysql as mysql
 import reader.tree as tree
+import os
 
-def semi_structured_main(fileDirs):
-    files = f.dirs(fileDirs)
+def semi_structured_main(path):
+    files = []
     questionAnswer = {}
+    if os.path.isfile(path):
+        files.append(path)
+    else:
+        files = f.dirs(path, files)
     for file in files:
         file_name = file.split("\\")[-1]
         trees = None
@@ -20,5 +25,5 @@ def semi_structured_main(fileDirs):
     return questionAnswer
 
 if __name__ == '__main__':
-    semi_structured_main("text")
+    print(semi_structured_main("text"))
 

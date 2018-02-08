@@ -29,6 +29,8 @@ def insert_mysql(values):
                     ans.add(s)
         ans.add(anwser)
         questionAnwser[ask]=ans
+    for i in questionAnwser.keys():
+        questionAnwser[i] = list(questionAnwser[i])
     return questionAnwser
 
 
