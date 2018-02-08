@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-#!coding:utf-8
+# !coding:utf-8
 from collections import defaultdict
 import os
+
 
 def tree():
     """创建树"""
     return defaultdict(tree)
 
-def dirs(_dir,fileList):
+
+def dirs(_dir, fileList):
     """ 遍历文件夹
     :param _dir:  文件夹名字
     """

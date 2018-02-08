@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-#!coding:utf-8
+# !coding:utf-8
 import xlrd
 import reader.tree as tree
 import uuid
+
 
 def read_excel(excel_file):
     """ 读取文档
@@ -27,10 +28,10 @@ def read_excel(excel_file):
                 continue
             values[0] = str(uuid.uuid1())
             body.append(values)
-    return crate_tree(trees,header,body)
+    return crate_tree(trees, header, body)
 
 
-def crate_tree(trees,header,body):
+def crate_tree(trees, header, body):
     """创建树
     :return: 创建好一棵树
     """

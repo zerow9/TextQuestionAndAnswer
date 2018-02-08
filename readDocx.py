@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-#!coding:utf-8
+# !coding:utf-8
 from aip import AipNlp
 import pymysql
 import time
 import docx
+
 
 def baiduAPI():
     APP_ID = '10748348'
@@ -12,37 +13,39 @@ def baiduAPI():
     client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
     return client
 
-def connectDataBase(host,user,password,database,port):
+
+def connectDataBase(host, user, password, database, port):
     try:
         # connect = pymysql.connect(host="192.168.160.36",user="user_zwb",password="123456",db="grammer",port=3306,charset='utf8')
-        connect = pymysql.connect(host=host,user=user,password=password,db=database,port=port,charset='utf8')
+        connect = pymysql.connect(host=host, user=user, password=password, db=database, port=port, charset='utf8')
         cursor = connect.cursor()
-        return connect,cursor
+        return connect, cursor
     except Exception as e:
         print(e.args)
+
 
 def sentencesQuestionAnswer(documentName):
     questionAnswer = {}
     maxLenByte = 128
     minLenByte = 10
-    #获取文档对象
+    # 获取文档对象
     file = docx.Document(documentName)
     # print("段落数:"+str(len(file.paragraphs)))
     client = baiduAPI()
-    connect,cur = connectDataBase("192.168.160.36","user_zwb","123456","grammer",3306)
-    for para,paragraphNumber in zip(file.paragraphs,range(len(file.paragraphs))):
+    connect, cur = connectDataBase("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
+    for para, paragraphNumber in zip(file.paragraphs, range(len(file.paragraphs))):
         paragraphText = para.text.replace('　', '')
-        sentencePeriod = paragraphText.replace('!','。').replace('；','。').split('。')
+        sentencePeriod = paragraphText.replace('!', '。').replace('；', '。').split('。')
         sentences = []
         for i in sentencePeriod:
             if i != '':
-                if len(i)<=minLenByte:
+                if len(i) <= minLenByte:
                     continue
-                elif len(i)>maxLenByte:
+                elif len(i) > maxLenByte:
                     sentence = i.split('，')
                     for j in sentence:
                         if j != '':
-                            if len(j)<minLenByte:
+                            if len(j) < minLenByte:
                                 continue
                             else:
                                 sentences.append(j)
@@ -61,7 +64,8 @@ def sentencesQuestionAnswer(documentName):
                 else:
                     baidu_result = client.depParser(sentence)
                     try:
-                        if baidu_result['error_code'] in [4,14,17,18,19,100,110,111,311,282000,282002,282004,282130,282131,282133,282300,282301,282302,282303]:
+                        if baidu_result['error_code'] in [4, 14, 17, 18, 19, 100, 110, 111, 311, 282000, 282002, 282004,
+                                                          282130, 282131, 282133, 282300, 282301, 282302, 282303]:
                             continue
                     except Exception as e:
                         pass
@@ -91,7 +95,7 @@ def sentencesQuestionAnswer(documentName):
             whenFlag = False
             howFlag = False
             whoFlag = False
-            for deprel,number in zip(baidu_result['items'],range(len(baidu_result['items']))):
+            for deprel, number in zip(baidu_result['items'], range(len(baidu_result['items']))):
                 if flag:
                     if deprel['deprel'] == 'HED':
                         whatQuestion += deprel['word']
@@ -102,9 +106,9 @@ def sentencesQuestionAnswer(documentName):
                     else:
                         whatQuestion += deprel['word']
                 if whatFlag:
-                    if deprel['deprel'] == 'WP'and number == whatNumber+1:
+                    if deprel['deprel'] == 'WP' and number == whatNumber + 1:
                         whatNumber = number
-                    elif deprel['deprel'] == 'COO'and number == whatNumber+1:
+                    elif deprel['deprel'] == 'COO' and number == whatNumber + 1:
                         tmp = whatQuestion[:-2]
                         whatQuestion += tmp + deprel['word'] + '什么'
                         whatNumber = number
@@ -117,7 +121,8 @@ def sentencesQuestionAnswer(documentName):
                     whenNumber = number
                 else:
                     if whenFlag:
-                        if (deprel['deprel'] == 'COO' and number == whenNumber + 1) or (deprel['deprel'] == 'WP' and number == whenNumber + 1):
+                        if (deprel['deprel'] == 'COO' and number == whenNumber + 1) or (
+                                deprel['deprel'] == 'WP' and number == whenNumber + 1):
                             whenNumber = number
                         else:
                             whenFlag = False
@@ -130,7 +135,8 @@ def sentencesQuestionAnswer(documentName):
                     howFlag = True
                 else:
                     if howFlag:
-                        if (deprel['deprel'] == 'COO' and number == howNumber + 1) or (deprel['deprel'] == 'WP' and number == howNumber + 1):
+                        if (deprel['deprel'] == 'COO' and number == howNumber + 1) or (
+                                deprel['deprel'] == 'WP' and number == howNumber + 1):
                             howNumber = number
                         else:
                             howFlag = False
@@ -143,7 +149,8 @@ def sentencesQuestionAnswer(documentName):
                     whoFlag = True
                 else:
                     if whoFlag:
-                        if (deprel['deprel'] == 'COO' and number == whoNumber + 1) or (deprel['deprel'] == 'WP' and number == whoNumber + 1):
+                        if (deprel['deprel'] == 'COO' and number == whoNumber + 1) or (
+                                deprel['deprel'] == 'WP' and number == whoNumber + 1):
                             whoNumber = number
                         else:
                             whoFlag = False
@@ -151,18 +158,20 @@ def sentencesQuestionAnswer(documentName):
                         whoQuestion += deprel['word']
 
             if '什么' in whatQuestion:
-                questionAnswer[whatQuestion+'?'] = sentence
+                questionAnswer[whatQuestion + '?'] = sentence
             if '什么时候' in whenQuestion:
-                questionAnswer[whenQuestion+'?'] = sentence
+                questionAnswer[whenQuestion + '?'] = sentence
             if '多少' in howQuestion:
-                questionAnswer[howQuestion+'?'] = sentence
+                questionAnswer[howQuestion + '?'] = sentence
             if '谁/什么' in whoQuestion:
-                questionAnswer[whoQuestion+'?'] = sentence
+                questionAnswer[whoQuestion + '?'] = sentence
     connect.close()
     return questionAnswer
 
+
 def sentencesMain(path):
     return sentencesQuestionAnswer(path)
+
 
 if __name__ == '__main__':
     print(sentencesMain("nineteenReportDocuments.docx"))

@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-#!coding:utf-8
+# !coding:utf-8
 import docx
 import uuid
 import reader.tree as tree
 import random
 import string
+
 
 # 创建一个颗树
 def salt():
@@ -33,11 +34,11 @@ def reader_doc(doc_name):
                     body.append(c.text)
             if i != 0:
                 body.append(str(uuid.uuid1()))
-        trees = crate_tree(trees,head, body)
+        trees = crate_tree(trees, head, body)
     return trees
 
 
-def crate_tree(trees,head, body):
+def crate_tree(trees, head, body):
     """创建一棵树
     :param head: 树头
     :param body:  节点

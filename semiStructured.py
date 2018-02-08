@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-#!coding:utf-8
+# !coding:utf-8
 import reader.docxs as doc
 import reader.excel as excel
 import reader.tree as f
 import reader.mysql as mysql
 import reader.tree as tree
 import os
+
 
 def semi_structured_main(path):
     files = []
@@ -21,9 +22,9 @@ def semi_structured_main(path):
             trees = doc.reader_doc(file)
         if file.endswith(".xls"):
             trees = excel.read_excel(file)
-        questionAnswer = dict(questionAnswer,**(mysql.ergodic_tree(trees, file_name)))
+        questionAnswer = dict(questionAnswer, **(mysql.ergodic_tree(trees, file_name)))
     return questionAnswer
+
 
 if __name__ == '__main__':
     print(semi_structured_main("text"))
-
