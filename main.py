@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # !coding:utf-8
-from article_sturction_judge import article_sturction_judge_main
-from semiStructured import semi_structured_main
-from readDocx import sentencesMain
+
 import json
+
+from dataPreprocessing.article_sturction_judge import article_sturction_judge_main
+from dataPreprocessing.readDocx import sentencesMain
+from dataPreprocessing.semiStructured import semi_structured_main
 
 
 def main(noStructureDataPath, semiStructuredDataPathFolder):
@@ -25,6 +27,7 @@ if __name__ == '__main__':
     dictMerged = dict(dict(article_sturction_judge_main("nineteenReportDocuments.docx"),
                            **sentencesMain("nineteenReportDocuments.docx")),
                       **semi_structured_main("text"))
+    print(len(dictMerged.keys()))
     print(json.loads(main("nineteenReportDocuments.docx", "text")))
     # print(len(dictMerged.keys()))
     # print(len(article_sturction_judge_main("nineteenReportDocuments.docx").keys()))
