@@ -251,7 +251,11 @@ class Database(object):
         '''
         sql = '''select article_id from article WHERE article_name="%s"'''
         self.cur.execute(sql % (articleName.replace('\\','/').split('/')[-1]))
-        return self.cur.fetchall()[0][0]
+        data = self.cur.fetchall()
+        if len(data)>0:
+            return data[0][0]
+        else:
+            return None
 
     def selectDataArticleUser(self,ownUser,start=0,page=10):
         '''
