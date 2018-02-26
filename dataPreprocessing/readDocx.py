@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # !coding:utf-8
+from databaseInterface.database import *
 from aip import AipNlp
 import pymysql
 import time
@@ -13,17 +14,6 @@ def baiduAPI():
     client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
     return client
 
-
-def connectDataBase(host, user, password, database, port):
-    try:
-        # connect = pymysql.connect(host="192.168.160.36",user="user_zwb",password="123456",db="grammer",port=3306,charset='utf8')
-        connect = pymysql.connect(host=host, user=user, password=password, db=database, port=port, charset='utf8')
-        cursor = connect.cursor()
-        return connect, cursor
-    except Exception as e:
-        print(e.args)
-
-
 def sentencesQuestionAnswer(documentName):
     questionAnswer = {}
     maxLenByte = 128
@@ -32,7 +22,9 @@ def sentencesQuestionAnswer(documentName):
     file = docx.Document(documentName)
     # print("段落数:"+str(len(file.paragraphs)))
     client = baiduAPI()
-    connect, cur = connectDataBase("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
+    operating = Database("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
+    articleId = operating.selectDataArticleByArticleName(documentName)
+
     for para, paragraphNumber in zip(file.paragraphs, range(len(file.paragraphs))):
         paragraphText = para.text.replace('　', '')
         sentencePeriod = paragraphText.replace('!', '。').replace('；', '。').split('。')
@@ -54,10 +46,12 @@ def sentencesQuestionAnswer(documentName):
         # fileOpen.write(str(sentences)+'\n')
         for sentence in sentences:
             flagSQL = True
+            fromProduce = ''
             try:
-                selectSQL = "SELECT items FROM questionANDanswer WHERE text=\'%s\'"
-                cur.execute(selectSQL % sentence)
-                ls = cur.fetchall()
+                # selectSQL = "SELECT baiduResult FROM baiduResult WHERE sentence=\'%s\'"
+                # cur.execute(selectSQL % sentence)
+                ls = operating.selectDataBaiduResult(sentence)
+                fromProduce = ls[0][1]
                 if len(ls):
                     baidu_result = eval(ls[0][0])
                     flagSQL = False
@@ -73,14 +67,15 @@ def sentencesQuestionAnswer(documentName):
                 print(e.args)
                 continue
             if flagSQL:
-                try:
-                    # sql = '''insert into questionANDanswer(log_id,text,items) VALUES (%d,\"%s\",\"%s\")'''
-                    cur.execute(sql % (baidu_result['log_id'], baidu_result['text'], baidu_result))
-                    cur.lastrowid
-                    connect.commit()
-                except Exception as e:
-                    connect.rollback()
-                    print(e.args)
+                fromProduce = operating.insertDataBaiduResult(articleId,sentence,baidu_result)
+                # try:
+                #     # sql = '''insert into questionANDanswer(log_id,text,items) VALUES (%d,\"%s\",\"%s\")'''
+                #     cur.execute(sql % (baidu_result['log_id'], baidu_result['text'], baidu_result))
+                #     cur.lastrowid
+                #     connect.commit()
+                # except Exception as e:
+                #     connect.rollback()
+                #     print(e.args)
             whatQuestion = ''
             whoQuestion = ''
             whenQuestion = ''
@@ -158,14 +153,17 @@ def sentencesQuestionAnswer(documentName):
                         whoQuestion += deprel['word']
 
             if '什么' in whatQuestion:
+                operating.insertDataQuestionAnswer(documentName,fromProduce,whatQuestion+'?',[sentence])
                 questionAnswer[whatQuestion + '?'] = [sentence]
             if '什么时候' in whenQuestion:
+                operating.insertDataQuestionAnswer(documentName,fromProduce,whenQuestion+'?',[sentence])
                 questionAnswer[whenQuestion + '?'] = [sentence]
             if '多少' in howQuestion:
+                operating.insertDataQuestionAnswer(documentName,fromProduce,howQuestion+'?',[sentence])
                 questionAnswer[howQuestion + '?'] = [sentence]
             if '谁/什么' in whoQuestion:
+                operating.insertDataQuestionAnswer(documentName,fromProduce,whoQuestion+'?',[sentence])
                 questionAnswer[whoQuestion + '?'] = [sentence]
-    connect.close()
     return questionAnswer
 
 
@@ -174,4 +172,4 @@ def sentencesMain(path):
 
 
 if __name__ == '__main__':
-    print(sentencesMain("nineteenReportDocuments.docx"))
+    print(sentencesMain("../nineteenReportDocuments.docx"))
