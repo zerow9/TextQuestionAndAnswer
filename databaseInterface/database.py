@@ -93,6 +93,17 @@ class Database(object):
             self.connect.rollback()
             print(e.args)
 
+    def insertDataQuestionParagraph(self,fromArticle,paragraphContent):
+        paragraphId = str(uuid.uuid1()).replace('-','')
+        try:
+            sql = '''insert into paragraph(paragraph_id,from_article,paragraph_content) VALUES ("%s","%s","%s")'''
+            self.cur.execute(sql%(paragraphId,fromArticle,paragraphContent))
+            self.connect.commit()
+            return paragraphId
+        except Exception as e:
+            self.connect.rollback()
+            print(e.args)
+
     # '''-----------------------------------删------------------------------------------------'''
     def deleteDataArticle(self,articleId):
         '''

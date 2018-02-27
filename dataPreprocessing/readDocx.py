@@ -44,18 +44,18 @@ def sentencesQuestionAnswer(documentName):
                 else:
                     sentences.append(i)
         # fileOpen.write(str(sentences)+'\n')
+        fromParagraph = operating.insertDataQuestionParagraph(articleId,paragraphText)
         for sentence in sentences:
             flagSQL = True
-            fromProduce = ''
             try:
                 # selectSQL = "SELECT baiduResult FROM baiduResult WHERE sentence=\'%s\'"
                 # cur.execute(selectSQL % sentence)
-                ls = operating.selectDataBaiduResult(sentence)
-                fromProduce = ls[0][1]
-                if len(ls):
+                try:
+                    ls = operating.selectDataBaiduResult(sentence)
+                    fromProduce = ls[0][1]
                     baidu_result = eval(ls[0][0])
                     flagSQL = False
-                else:
+                except:
                     baidu_result = client.depParser(sentence)
                     try:
                         if baidu_result['error_code'] in [4, 14, 17, 18, 19, 100, 110, 111, 311, 282000, 282002, 282004,
@@ -153,16 +153,16 @@ def sentencesQuestionAnswer(documentName):
                         whoQuestion += deprel['word']
 
             if '什么' in whatQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromProduce,whatQuestion+'?',[sentence])
+                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whatQuestion+'?',[sentence])
                 questionAnswer[whatQuestion + '?'] = [sentence]
             if '什么时候' in whenQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromProduce,whenQuestion+'?',[sentence])
+                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whenQuestion+'?',[sentence])
                 questionAnswer[whenQuestion + '?'] = [sentence]
             if '多少' in howQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromProduce,howQuestion+'?',[sentence])
+                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,howQuestion+'?',[sentence])
                 questionAnswer[howQuestion + '?'] = [sentence]
             if '谁/什么' in whoQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromProduce,whoQuestion+'?',[sentence])
+                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whoQuestion+'?',[sentence])
                 questionAnswer[whoQuestion + '?'] = [sentence]
     return questionAnswer
 
