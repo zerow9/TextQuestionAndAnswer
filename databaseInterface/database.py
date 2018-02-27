@@ -29,20 +29,21 @@ class Database(object):
         self.port = port
         self.connect,self.cur = connectDataBase(self.host,self.user,self.passwd,self.database,self.port)
     # '''-----------------------------------增------------------------------------------------'''
-    def insertDataArticle(self,ownUser,articleName,articlePath):
+    def insertDataArticle(self,ownUser,articleName,articlePath,fromField):
         '''
         插入数据到文章表
         :param ownUser:文件上传者
         :param articleName: 文件名称
         :param articlePath: 文件存储的位置
+        :param fromField：文章所属领域/类型
         article_id:文件编号
         :return:
         '''
         articleId = str(uuid.uuid1()).replace('-','')
         try:
             articleName = articleName.replace('\\', '/').split('/')[-1]
-            sql = '''insert into article(article_id,own_user,article_name,article_path) VALUES ("%s",%d,"%s","%s")'''
-            self.cur.execute(sql%(articleId,ownUser,articleName,articlePath))
+            sql = '''insert into article(article_id,own_user,article_name,article_path,from_field) VALUES ("%s",%d,"%s","%s","%s")'''
+            self.cur.execute(sql%(articleId,ownUser,articleName,articlePath,fromField))
             self.connect.commit()
         except Exception as e:
             self.connect.rollback()
@@ -68,11 +69,12 @@ class Database(object):
             self.connect.rollback()
             print(e.args)
 
-    def insertDataQuestionAnswer(self,ownArticle,fromProduce,question,answer):
+    def insertDataQuestionAnswer(self,ownArticle,fromParagraph,fromProduce,question,answer):
         '''
         插入数据到问题答案键值对表
         :param fromProduce: 来自哪条百度API结果
         :param ownArticle:句子所属文章
+        :param fromParagraph:句子所属文章段落
         :param question: 问题
         :param answer: 答案
         questionAnswer_id:键值对ID
@@ -84,8 +86,8 @@ class Database(object):
         produceTime = time.strftime("%Y-%m-%d %H:%M:%S")
         try:
             ownArticle = ownArticle.replace('\\', '/').split('/')[-1]
-            sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_produce,question,answer,produce_time) VALUES ("%s","%s","%s","%s","%s","%s")'''
-            self.cur.execute(sql%(questionAnswerId,ownArticle,fromProduce,question,answer,produceTime))
+            sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_paragraph,from_produce,question,answer,produce_time) VALUES ("%s","%s","%s","%s","%s","%s","%s")'''
+            self.cur.execute(sql%(questionAnswerId,ownArticle,fromParagraph,fromProduce,question,answer,produceTime))
             self.connect.commit()
         except Exception as e:
             self.connect.rollback()
@@ -164,6 +166,7 @@ class Database(object):
             own_user：文章上传者
             article_name：文章名称
             article_path：文章存储路径
+            from_field：文章所属领域/类型
             article_sentences_number：文章中间结果
         :return:
         '''
