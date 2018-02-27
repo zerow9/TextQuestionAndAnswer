@@ -27,7 +27,7 @@ def semi_structured_main(path):
         question = mysql.ergodic_tree(trees, file_name)
         articleId = operating.selectDataArticleByArticleName(file_name)
         for key in question:
-            operating.insertDataQuestionAnswer(articleId,'',key,question[key])
+            operating.insertDataQuestionAnswer(articleId,'','',key,question[key])
         questionAnswer = dict(questionAnswer, **(question))
     return questionAnswer
 
