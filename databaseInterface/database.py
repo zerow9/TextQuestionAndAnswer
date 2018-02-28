@@ -41,7 +41,6 @@ class Database(object):
         '''
         articleId = str(uuid.uuid1()).replace('-','')
         try:
-            articleName = articleName.replace('\\', '/').split('/')[-1]
             sql = '''insert into article(article_id,own_user,article_name,article_path,from_field) VALUES ("%s",%d,"%s","%s","%s")'''
             self.cur.execute(sql%(articleId,ownUser,articleName,articlePath,fromField))
             self.connect.commit()
@@ -60,7 +59,6 @@ class Database(object):
         '''
         baiduResultId = str(uuid.uuid1()).replace('-','')
         try:
-            ownArticle = ownArticle.replace('\\', '/').split('/')[-1]
             sql = '''insert into baiduResult(baiduResult_id,own_article,sentence,baiduResult) VALUES ("%s","%s","%s","%s")'''
             self.cur.execute(sql%(baiduResultId,ownArticle,sentence,baiduResult))
             self.connect.commit()
@@ -85,7 +83,6 @@ class Database(object):
         questionAnswerId = str(uuid.uuid1()).replace('-','')
         produceTime = time.strftime("%Y-%m-%d %H:%M:%S")
         try:
-            ownArticle = ownArticle.replace('\\', '/').split('/')[-1]
             sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_paragraph,from_produce,question,answer,produce_time) VALUES ("%s","%s","%s","%s","%s","%s","%s")'''
             self.cur.execute(sql%(questionAnswerId,ownArticle,str([fromParagraph]),fromProduce,question,str(answer),produceTime))
             self.connect.commit()
