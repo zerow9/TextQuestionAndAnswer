@@ -45,7 +45,9 @@ def sentencesQuestionAnswer(documentName):
                     sentences.append(i)
         # fileOpen.write(str(sentences)+'\n')
         paragraphTextContent = operating.selectDataParagraphText(documentName.replace('\\','/').split('/')[-1])
-        if paragraphText not in paragraphTextContent:
+        if paragraphText not in paragraphTextContent :
+            if paragraphText =='':
+                continue
             fromParagraph = operating.insertDataQuestionParagraph(articleId,paragraphText)
         else:
             fromParagraph = paragraphTextContent[paragraphText]
