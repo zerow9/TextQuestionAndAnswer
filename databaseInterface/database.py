@@ -411,3 +411,19 @@ class Database(object):
         except Exception as e:
             print(e.args)
         return question
+
+    def selectDataArticleName(self):
+        '''
+        查询所有的文件名称
+        :return: 所有文件名称列表
+        '''
+        articleName = []
+        try:
+            sql = '''select article_name from article'''
+            data = self.cur.execute(sql)
+            if data:
+                for i in self.cur.fetchall():
+                    articleName.append(i[0])
+        except Exception as e:
+            print(e.args)
+        return articleName
