@@ -83,8 +83,9 @@ def make_main_para(article, paragraph_head_order):
         return (para_order_final)
 
 
-def para_mid_QA(article, important_struction, paragraph_head_order):
+def para_mid_QA(article, important_struction, paragraph_head_order,path):
     # paragraph_head_order="[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
+    operating = Database("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
     keys_list = []
     values_list = []
 
@@ -114,21 +115,33 @@ def para_mid_QA(article, important_struction, paragraph_head_order):
                 QA_list[para_order_construction["values"][row_num]] = answer_list
 
     QA_list_final = {}
+    arctileId = operating.selectDataArticleByArticleName(path.replace('\\','/').split('/')[-1])
     for key, value in QA_list.items():
         key = article[key]
         key = re.sub(paragraph_head_order, "", key, 1)
+        paragraphId = operating.selectDataParagraph(arctileId,key)
         key += "包括哪些方面?"
         value_final = []
         for value_small in value:
             value_small = article[value_small]
             value_small = value_small.split("。")[0]
-            value_final.append(value_small.replace("　", ''))
+            tmp = value_small.replace("　", '')
+            value_final.append(tmp)
+            praID = operating.selectDataParagraph(arctileId,tmp)
+            if len(praID)>0:
+                paragraphId.extend(praID)
         QA_list_final[key.replace("　", '')] = value_final
+        paragraph = operating.selectDataQuestionAnswerQuestion("=''")
+        if key.replace("　", '') in paragraph:
+            continue
+        data = {'article_sentences_number': '\"' + str(important_struction) + '\"'}
+        articleId = operating.selectDataArticleByArticleName(path.replace('\\', '/').split('/')[-1])
+        operating.updateDataArticle(articleId, **data)
+        operating.insertDataQuestionAnswer(arctileId,str(paragraphId),'',key.replace("　", ''),value_final)
     return QA_list_final
 
 
 def article_sturction_judge_main(path):
-    operating = Database("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
     # path = "nineteenReportDocuments.docx"
     document = Document(path)
     article = []
@@ -136,13 +149,7 @@ def article_sturction_judge_main(path):
         article.append(paragraph.text)
     paragraph_head_order = "[*]|{*}|\(*\)|（*）|[一二三四五六七八九十]{1,3}[、.]|[0-9]{1,3}[、.]|【*】"
     important_struction = make_main_para(article, paragraph_head_order)  # 中间结果
-    questionAnswer = para_mid_QA(article, important_struction, paragraph_head_order)
-    print(str(important_struction))
-    data = {'article_sentences_number':'\"'+str(important_struction)+'\"'}
-    articleId = operating.selectDataArticleByArticleName(path.replace('\\','/').split('/')[-1])
-    operating.updateDataArticle(articleId,**data)
-    for key in questionAnswer:
-        operating.insertDataQuestionAnswer(articleId,'',key,questionAnswer[key])
+    questionAnswer = para_mid_QA(article, important_struction, paragraph_head_order,path)
     return questionAnswer
 
 

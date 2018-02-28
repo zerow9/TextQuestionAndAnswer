@@ -220,6 +220,7 @@ class Database(object):
         :param questionAnswerId:需要修改的问题答案键值对ID
         :param kwargs:
             own_article:所属文章
+            from_paragraph: 键值对所属段落
             from_produce：百度API结果
             question：问题
             answer：答案
@@ -227,6 +228,8 @@ class Database(object):
             yes_or_no：是否合理问题
             form_user：确认用户
             commit_time：确认时间
+            modify:是否修改（0-未修改，1-修改）
+            credibility：键值对（问题）的可信度
         :return:
         '''
         commitTime = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -264,7 +267,7 @@ class Database(object):
         :return:文章ID
         '''
         sql = '''select article_id from article WHERE article_name="%s"'''
-        self.cur.execute(sql % (articleName.replace('\\','/').split('/')[-1]))
+        self.cur.execute(sql % (articleName))
         data = self.cur.fetchall()
         if len(data)>0:
             return data[0][0]
@@ -359,3 +362,55 @@ class Database(object):
         for key in self.cur.fetchall():
             data.append(key)
         return data
+
+    def selectDataParagraph(self,fromArticle,paragraphContent):
+        '''
+        根据来自哪篇文章以及段落类容查询段落表唯一ID
+        :param fromArticle: 来自哪篇文章
+        :param paragraphContent: 段落类容
+        :return: 段落表唯一ID
+        '''
+        paragraph = []
+        try:
+            sql = '''select paragraph_id from paragraph where from_article="{0}" and paragraph_content like "%{1}%"'''.format(fromArticle,paragraphContent)
+            number = self.cur.execute(sql)
+            if number:
+                for i in self.cur.fetchall():
+                    paragraph.append(i[0])
+        except Exception as e:
+            print(e.args)
+        return paragraph
+
+    def selectDataParagraphText(self,fromArticle):
+        '''
+        根据来自哪篇文章查询该文章下所有段落ID及该段落的内容
+        :param fromArticle: 来自哪篇文章
+        :return: {段落类容：段落ID}的字典序列
+        '''
+        paragraphText = {}
+        try:
+            sql = '''select paragraph_id,paragraph_content from paragraph where from_article="%s"'''
+            number = self.cur.execute(sql%fromArticle)
+            if number:
+                for i in self.cur.fetchall():
+                    paragraphText[i[1]]=[i[0]]
+        except Exception as e:
+            print(e.args)
+        return paragraphText
+
+    def selectDataQuestionAnswerQuestion(self,para):
+        '''
+        查询问题答案键值对表中的内容
+        :param para: "=''"或者"!=''"
+        :return: 问题列表
+        '''
+        question = []
+        try:
+            sql = '''select question from questionAnswer where from_produce%s '''
+            data = self.cur.execute(sql%para)
+            if data:
+                for i in self.cur.fetchall():
+                    question.append(i[0])
+        except Exception as e:
+            print(e.args)
+        return question

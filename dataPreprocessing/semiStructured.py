@@ -11,6 +11,7 @@ import os
 
 def semi_structured_main(path):
     operating = Database("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
+    allQuestion = operating.selectDataQuestionAnswerQuestion("=''")
     files = []
     questionAnswer = {}
     if os.path.isfile(path):
@@ -27,7 +28,8 @@ def semi_structured_main(path):
         question = mysql.ergodic_tree(trees, file_name)
         articleId = operating.selectDataArticleByArticleName(file_name)
         for key in question:
-            operating.insertDataQuestionAnswer(articleId,'','',key,question[key])
+            if key not in allQuestion:
+                operating.insertDataQuestionAnswer(articleId,'','',key,question[key])
         questionAnswer = dict(questionAnswer, **(question))
     return questionAnswer
 

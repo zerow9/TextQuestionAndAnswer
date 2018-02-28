@@ -23,8 +23,8 @@ def sentencesQuestionAnswer(documentName):
     # print("段落数:"+str(len(file.paragraphs)))
     client = baiduAPI()
     operating = Database("192.168.160.36", "user_zwb", "123456", "grammer", 3306)
-    articleId = operating.selectDataArticleByArticleName(documentName)
-
+    articleId = operating.selectDataArticleByArticleName(documentName.replace('\\','/').split('/')[-1])
+    question = operating.selectDataQuestionAnswerQuestion("!=''")
     for para, paragraphNumber in zip(file.paragraphs, range(len(file.paragraphs))):
         paragraphText = para.text.replace('　', '')
         sentencePeriod = paragraphText.replace('!', '。').replace('；', '。').split('。')
@@ -44,7 +44,11 @@ def sentencesQuestionAnswer(documentName):
                 else:
                     sentences.append(i)
         # fileOpen.write(str(sentences)+'\n')
-        fromParagraph = operating.insertDataQuestionParagraph(articleId,paragraphText)
+        paragraphTextContent = operating.selectDataParagraphText(documentName.replace('\\','/').split('/')[-1])
+        if paragraphText not in paragraphTextContent:
+            fromParagraph = operating.insertDataQuestionParagraph(articleId,paragraphText)
+        else:
+            fromParagraph = paragraphTextContent[paragraphText]
         for sentence in sentences:
             flagSQL = True
             try:
@@ -153,16 +157,20 @@ def sentencesQuestionAnswer(documentName):
                         whoQuestion += deprel['word']
 
             if '什么' in whatQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whatQuestion+'?',[sentence])
+                if whatQuestion+'?' not in question:
+                    operating.insertDataQuestionAnswer(articleId,fromParagraph,fromProduce,whatQuestion+'?',[sentence])
                 questionAnswer[whatQuestion + '?'] = [sentence]
             if '什么时候' in whenQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whenQuestion+'?',[sentence])
+                if whenQuestion+'?' not in question:
+                    operating.insertDataQuestionAnswer(articleId,fromParagraph,fromProduce,whenQuestion+'?',[sentence])
                 questionAnswer[whenQuestion + '?'] = [sentence]
             if '多少' in howQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,howQuestion+'?',[sentence])
+                if howQuestion+'?' not in question:
+                    operating.insertDataQuestionAnswer(articleId,fromParagraph,fromProduce,howQuestion+'?',[sentence])
                 questionAnswer[howQuestion + '?'] = [sentence]
             if '谁/什么' in whoQuestion:
-                operating.insertDataQuestionAnswer(documentName,fromParagraph,fromProduce,whoQuestion+'?',[sentence])
+                if whoQuestion+'?' not in question:
+                    operating.insertDataQuestionAnswer(articleId,fromParagraph,fromProduce,whoQuestion+'?',[sentence])
                 questionAnswer[whoQuestion + '?'] = [sentence]
     return questionAnswer
 
