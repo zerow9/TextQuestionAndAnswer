@@ -137,7 +137,7 @@ def para_mid_QA(article, important_struction, paragraph_head_order,path):
         data = {'article_sentences_number': '\"' + str(important_struction) + '\"'}
         articleId = operating.selectDataArticleByArticleName(path.replace('\\', '/').split('/')[-1])
         operating.updateDataArticle(articleId, **data)
-        operating.insertDataQuestionAnswer(arctileId,str(paragraphId),'',key.replace("　", ''),value_final)
+        operating.insertDataQuestionAnswer(arctileId,paragraphId,'',key.replace("　", ''),value_final)
     return QA_list_final
 
 

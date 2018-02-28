@@ -87,7 +87,7 @@ class Database(object):
         try:
             ownArticle = ownArticle.replace('\\', '/').split('/')[-1]
             sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_paragraph,from_produce,question,answer,produce_time) VALUES ("%s","%s","%s","%s","%s","%s","%s")'''
-            self.cur.execute(sql%(questionAnswerId,ownArticle,fromParagraph,fromProduce,question,answer,produceTime))
+            self.cur.execute(sql%(questionAnswerId,ownArticle,fromParagraph,fromProduce,question,str(answer),produceTime))
             self.connect.commit()
         except Exception as e:
             self.connect.rollback()
