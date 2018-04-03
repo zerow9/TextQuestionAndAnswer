@@ -67,7 +67,7 @@ class Database(object):
             self.connect.rollback()
             print(e.args)
 
-    def insertDataQuestionAnswer(self,ownArticle,fromParagraph,fromProduce,question,answer):
+    def insertDataQuestionAnswer(self,ownArticle,fromParagraph,fromProduce,question,answer,modify=0):
         '''
         插入数据到问题答案键值对表
         :param fromProduce: 来自哪条百度API结果
@@ -83,8 +83,8 @@ class Database(object):
         questionAnswerId = str(uuid.uuid1()).replace('-','')
         produceTime = time.strftime("%Y-%m-%d %H:%M:%S")
         try:
-            sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_paragraph,from_produce,question,answer,produce_time) VALUES ("%s","%s","%s","%s","%s","%s","%s")'''
-            self.cur.execute(sql%(questionAnswerId,ownArticle,str([fromParagraph]),fromProduce,question,str(answer),produceTime))
+            sql = '''insert into questionAnswer(questionAnswer_id,own_article,from_paragraph,from_produce,question,answer,produce_time,modify) VALUES ("%s","%s","%s","%s","%s","%s","%s",%d)'''
+            self.cur.execute(sql%(questionAnswerId,ownArticle,str([fromParagraph]),fromProduce,question,str(answer),produceTime,modify))
             self.connect.commit()
         except Exception as e:
             self.connect.rollback()
@@ -237,6 +237,38 @@ class Database(object):
             sql += ''' commit_time="%s" where questionAnswer_id="%s"'''%(commitTime,questionAnswerId)
             # sql = '''UPDATE article SET WHERE article_id="%s" '''
             self.cur.execute(sql)
+            self.connect.commit()
+        except Exception as e:
+            self.connect.rollback()
+            print(e.args)
+
+    def updateDateQuestionAnswerByQuestionAnswerIdModify(self,questionAnswerId,modifyNumber):
+        '''
+        修改是否正在修改数据，1表示正在修改数据
+        :param questionAnswerId: 问题ID
+        :param modifyNumber: 是否正在修改（0,1）1表示正在修改数据
+        :return:
+        '''
+        try:
+            sql = '''UPDATE questionAnswer SET modify=%d where questionAnswer_id="%s"'''
+            self.cur.execute(sql%(modifyNumber,questionAnswerId))
+            self.connect.commit()
+        except Exception as e:
+            self.connect.rollback()
+            print(e.args)
+
+    def updateDateQuestionAnswerByQuestionAnswerModify(self,questionAnswerId,question,answer,modifyNumber=0):
+        '''
+        根据问题ID修改前端修改返回之后的问题答案集
+        :param questionAnswerId: 问题ID
+        :param question: 问题
+        :param answer: 答案
+        :param modifyNumber:是否正在修改，默认修改为没有正在修改
+        :return:
+        '''
+        try:
+            sql = '''UPDATE questionAnswer SET question="%s",answer="%s",modify=%d where questionAnswer_id="%s"'''
+            self.cur.execute(sql%(question,answer,modifyNumber,questionAnswerId))
             self.connect.commit()
         except Exception as e:
             self.connect.rollback()
@@ -427,3 +459,26 @@ class Database(object):
         except Exception as e:
             print(e.args)
         return articleName
+
+    def selectDataQuestionAnswerNumberModify(self,startNumber=0,endNumber=10):
+        '''
+        查询问题答案，可以实现查看跟修改
+        :param startNumber: 从第几条开始查，默认从0开始查询
+        :param endNumber: 需要查询多少条数据，默认查询10条数据
+        :return: questionAnswer_id(问题ID),question(问题),answer(答案),modify(是否正在修改，0未在修改，1正在修改)默认第一次查询的时候正在修改
+        返回一个包含以上数据的一个列表
+        '''
+        questionAnswer = []
+        try:
+            sql = '''select questionAnswer_id,question,answer,modify from questionAnswer limit %d,%d'''
+            data = self.cur.execute(sql%(startNumber,endNumber))
+            if data:
+                for i in self.cur.fetchall():
+                    questionAnswer.append(i)
+                    print(i[2])
+                    if i[3]==0:
+                        self.updateDateQuestionAnswerByQuestionAnswerIdModify(i[0],1)
+        except Exception as e:
+            print(e.args)
+
+        return questionAnswer
